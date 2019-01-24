@@ -46,8 +46,8 @@ module ImageEffects
     w = image_rep.width
     h = image_rep.height
 
-    w_max = w - 1
-    h_max = h - 1
+    x_max = w - 1
+    y_max = h - 1
 
     clamp = lambda { |a, x, b| [a, x, b].sort[1] }
 
@@ -56,13 +56,17 @@ module ImageEffects
     new_colors = colors.each_with_index.map { |color, i|
       x = i % w
       y = i / w
-      row_i = y * w
+      # row_i = y * w
 
       # p [i, x, y, ri]
 
-      ri = row_i + clamp.call(0, x + ro, w_max)
-      gi = row_i + clamp.call(0, x + go, w_max)
-      bi = row_i + clamp.call(0, x + bo, w_max)
+      ry = clamp.call(0, y + ro.y, y_max)
+      gy = clamp.call(0, y + go.y, y_max)
+      by = clamp.call(0, y + bo.y, y_max)
+
+      ri = (ry * w) + clamp.call(0, x + ro.x, x_max)
+      gi = (gy * w) + clamp.call(0, x + go.x, x_max)
+      bi = (by * w) + clamp.call(0, x + bo.x, x_max)
 
       # p [ri, gi, bi]
 
@@ -89,8 +93,8 @@ end
 
 module Example
 
-  # Example.apply_effect(red: 2, blue: -2)
-  def self.apply_effect(red: 0, green: 0, blue: 0)
+  # Example.apply_effect(red: [2, 2], blue: [-2, -2])
+  def self.apply_effect(red: [0, 0], green: [0, 0], blue: [0, 0])
     model = Sketchup.active_model
     selection = model.selection
     materials = model.materials
